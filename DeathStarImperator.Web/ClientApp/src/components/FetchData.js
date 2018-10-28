@@ -4,12 +4,21 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/WeatherForecasts';
 
+
 class FetchData extends Component {
   componentWillMount() {
     // This method runs when the component is first added to the page
     const startDateIndex = parseInt(this.props.match.params.startDateIndex, 10) || 0;
     this.props.requestWeatherForecasts(startDateIndex);
   }
+
+  componentDidMount() {
+    const nick = "John117"; //window.prompt('Your name:', 'John');
+
+    this.props.connectToHub(nick);
+  }
+
+  // TODO: Handle unmount and disconnect
 
   componentWillReceiveProps(nextProps) {
     // This method runs when incoming props (e.g., route params) change

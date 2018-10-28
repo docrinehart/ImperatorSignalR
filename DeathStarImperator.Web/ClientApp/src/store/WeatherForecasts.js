@@ -1,6 +1,13 @@
-﻿const requestWeatherForecastsType = 'REQUEST_WEATHER_FORECASTS';
+﻿import * as signalR from '@aspnet/signalr';
+
+const requestWeatherForecastsType = 'REQUEST_WEATHER_FORECASTS';
 const receiveWeatherForecastsType = 'RECEIVE_WEATHER_FORECASTS';
-const initialState = { forecasts: [], isLoading: false };
+const initialState = {
+  forecasts: [],
+  isLoading: false,
+  hubConnection: null,
+  nickname: ''
+};
 
 export const actionCreators = {
   requestWeatherForecasts: startDateIndex => async (dispatch, getState) => {    
@@ -16,11 +23,48 @@ export const actionCreators = {
     const forecasts = await response.json();
 
     dispatch({ type: receiveWeatherForecastsType, startDateIndex, forecasts });
+  },
+
+  connectToHub: nickname => async (dispatch, getState) => {
+    if (getState().hubConnection != null) {
+      console.log('Connection exists...', );
+      return;
+    }
+
+    const hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('/testHub')
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    dispatch({ type: 'SET_CONNECTION', hubConnection, nickname });
+
+    hubConnection
+      .start()
+      .then(() => console.log('Connection started!'))
+      .catch(err => console.log('Error while establishing connection :('));
+
+    hubConnection.on('receiveMessage', (nick, receivedMessage) => {
+      const text = `${nick}: ${receivedMessage}`;
+      //const messages = this.state.messages.concat([text]);
+      console.log(text);
+      //console.log(messages.length)
+      //this.setState({ messages });
+    });
+
+    
   }
 };
 
 export const reducer = (state, action) => {
   state = state || initialState;
+
+  if (action.type === 'SET_CONNECTION') {
+    return {
+      ...state,
+      hubConnection: action.hubConnection,
+      nickname: action.nickname
+    }
+  }
 
   if (action.type === requestWeatherForecastsType) {
     return {
