@@ -10,7 +10,7 @@ const initialState = {
 };
 
 export const actionCreators = {
-  requestWeatherForecasts: startDateIndex => async (dispatch, getState) => {    
+  requestWeatherForecasts: startDateIndex => async (dispatch, getState) => {
     if (startDateIndex === getState().weatherForecasts.startDateIndex) {
       // Don't issue a duplicate request (we already have or are loading the requested data)
       return;
@@ -26,8 +26,12 @@ export const actionCreators = {
   },
 
   connectToHub: nickname => async (dispatch, getState) => {
-    if (getState().hubConnection != null) {
-      console.log('Connection exists...', );
+    let state = getState();
+    
+    console.log(state);
+
+    if (state.hubConnection != null) {
+      console.log('Connection exists...');
       return;
     }
 
@@ -42,7 +46,7 @@ export const actionCreators = {
       .start()
       .then(() => console.log('Connection started!'))
       .catch(err => console.log('Error while establishing connection :('));
-
+    
     hubConnection.on('receiveMessage', (nick, receivedMessage) => {
       const text = `${nick}: ${receivedMessage}`;
       //const messages = this.state.messages.concat([text]);
@@ -51,7 +55,16 @@ export const actionCreators = {
       //this.setState({ messages });
     });
 
+    //hubConnection.
+  },
+
+  disconnectHub: () => async (dispatch, getState) => {
+    console.log("disconnecting");
+    let state = getState();
     
+    console.log(state);
+
+    state.weatherForecasts.hubConnection.stop();
   }
 };
 

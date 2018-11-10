@@ -18,7 +18,10 @@ class FetchData extends Component {
     this.props.connectToHub(nick);
   }
 
-  // TODO: Handle unmount and disconnect
+  componentWillUnmount() {
+    console.log("unmounting");
+    this.props.disconnectHub();
+  }
 
   componentWillReceiveProps(nextProps) {
     // This method runs when incoming props (e.g., route params) change
