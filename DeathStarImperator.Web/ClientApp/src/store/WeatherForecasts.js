@@ -44,7 +44,10 @@ export const actionCreators = {
 
     hubConnection
       .start()
-      .then(() => console.log('Connection started!'))
+      .then(() => {
+        console.log('Connection started!');
+        hubConnection.invoke("SendMessage", "userTest", "I am a test message. YEY!");
+      })
       .catch(err => console.log('Error while establishing connection :('));
     
     hubConnection.on('receiveMessage', (nick, receivedMessage) => {
